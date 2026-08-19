@@ -5,25 +5,34 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - name: Install Dependencies
+
+      - name: Install System Dependencies
         run: |
-          pip install buildozer cython
           sudo apt-get update
-          sudo apt-get install -y libssl-dev libffi-dev libsqlite3-dev build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev openjdk-17-jdk zip unzip
-      - name: Build APK
+          sudo apt-get install -y build-essential libssl-dev libffi-dev libsqlite3-dev git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev openjdk-17-jdk zip unzip
+
+      - name: Install Buildozer & Cython
+        run: |
+          pip install --upgrade pip
+          pip install buildozer cython
+
+      - name: Build APK with Buildozer
         run: |
           buildozer init
           sed -i 's/# (str) Title of your application/title = NetBoost/g' buildozer.spec
           sed -i 's/# (str) Package name of your application/package.name = netboost/g' buildozer.spec
           sed -i 's/# (str) Package domain (needed for android/package.domain = com.netboost/g' buildozer.spec
+          sed -i 's/requirements = python3,kivy/requirements = python3,kivy/g' buildozer.spec
           buildozer -v android debug
+
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: NetBoost-APK
           path: bin/*.apk
