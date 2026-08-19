@@ -1,4 +1,4 @@
-name: Build Android APK
+Name: Build Android APK
 on: [push]
 
 jobs:
@@ -13,9 +13,11 @@ jobs:
           python-version: '3.10'
 
       - name: Install System Dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev libffi-dev libsqlite3-dev git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev openjdk-17-jdk zip unzip
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends build-essential libssl-dev libffi-dev libsqlite3-dev git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev openjdk-17-jdk zip unzip
 
       - name: Install Buildozer & Cython
         run: |
@@ -23,6 +25,8 @@ jobs:
           pip install buildozer cython
 
       - name: Build APK with Buildozer
+        env:
+          ACCEPT_SDK_LICENSES: 1
         run: |
           buildozer init
           sed -i 's/# (str) Title of your application/title = NetBoost/g' buildozer.spec
